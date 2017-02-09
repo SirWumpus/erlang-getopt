@@ -1,0 +1,18 @@
+{application, getopt, [
+	{vsn, "1.0.0"},
+	{description, "POSIX style command-line option parsing."},
+	{applications, [
+		kernel,
+		stdlib
+	]},
+	{licenses, ["MIT"]},
+	{registered, []},
+	{modules, [example, getopt]},
+	{env, []},
+	{files, [
+		"README.md",
+		"makefile",
+		"rebar.config",
+		"src"
+	]}
+]}.
