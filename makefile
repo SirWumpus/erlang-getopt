@@ -16,7 +16,7 @@ $E$B:
 
 all:
 #	erl -make
-	rebar3 escriptize
+	rebar3 compile
 
 clean:
 	-rm -rf src/*$B *dump
@@ -27,4 +27,7 @@ distclean: clean
 tar:
 	git archive --format tar.gz --prefix ${PROJ}/ -o ${PROJ}.tar.gz HEAD
 
+
+example:
+	rebar3 as example escriptize
 
