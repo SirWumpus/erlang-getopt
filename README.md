@@ -19,7 +19,7 @@ Exports
 
 ### parse(Args1, OptSpec) -> {ok, Plist, Args2} | {error, Reason, Glyph}
 
-Parse list of strings according to POSIX command-line option and argument rules.  An argument that starts with a leading hyphen (-) followed by a single character, "-f".  An option is either an option-flag, "-f", or option-parameter, "-x param".  Option-flags can appear together in any order as a list, "-hfg"; an option-argument can appear at the end of list of option-flags, "-hfgx arg" or "-hfgxparam".  Options can appear in any order until a "--" argument is seen, which indicates the remainder are only arguments.
+Parse list of strings according to POSIX command-line option and argument rules.  An argument that starts with a leading hyphen (-) followed by a single character, "-f".  An option is either an option-flag, "-f", or option-parameter, "-x param".  Option-flags can appear together in any order as a list, "-hfg"; an option-parameter can appear at the end of list of option-flags, "-hfgx param" or "-hfgxparam".  Options can appear in any order until a "--" argument is seen, which indicates the remainder are only arguments.
 
 `OptType` allows for certain common option idioms:
 
