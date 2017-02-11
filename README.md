@@ -1,5 +1,5 @@
-getopt
-======
+egetopt
+=======
 
 Parse list of strings according to POSIX command-line option and argument rules.  There is no support for GNU long option names, see [jcomellas/getopt](https://github.com/jcomellas/getopt) instead.
 
@@ -7,45 +7,67 @@ Data Types
 ----------
 
 * Args = [ string() ]
-* Glyph = alpha() | digits()
-* IsFlag = boolean()
-* Name = atom()
-* Olist = [ Option ]
-* Option = { Glyph, IsFlag, Name }
-* Plist = [ { Name, Value } ]
-* Value = boolean() | integer() | string()
+* Glyph = alpha() | digit()
+* Key = atom()
+* OptSpec = [ { Glyph, OptType, Key } ]
+* OptType = count | flag | list | param
+* Plist = [ { Key, Value } ]
+* Value = string()
 
 Exports
 -------
 
-### parse(Args1, Olist) -> {ok, Plist, Args2} | {error, Reason, Glyph}
+### parse(Args1, OptSpec) -> {ok, Plist, Args2} | {error, Reason, Glyph}
 
-Parse list of strings according to POSIX command-line option and argument rules.  An argument that starts with a leading hyphen (-) followed by a single character, "-f".  An option is either an option-flag, "-f", or option-argument, "-x arg".  Option-flags can appear together in any order as a list, "-hfg"; an option-argument can appear at the end of list of option-flags, "-hfgx arg" or "-hfgxarg".  Options can appear in any order until a "--" argument is seen, which indicates the remainder are only arguments.
+Parse list of strings according to POSIX command-line option and argument rules.  An argument that starts with a leading hyphen (-) followed by a single character, "-f".  An option is either an option-flag, "-f", or option-parameter, "-x param".  Option-flags can appear together in any order as a list, "-hfg"; an option-argument can appear at the end of list of option-flags, "-hfgx arg" or "-hfgxparam".  Options can appear in any order until a "--" argument is seen, which indicates the remainder are only arguments.
+
+`OptType` allows for certain common option idioms:
+
+* `count` repeated option-flag, "-f -f -f" or "-fgf".
+* `flag` set option-flag, "-f", true.
+* `list` to push repeated options onto a list, "-Idir1 -Idir2".
+* `param` for an option-parameter, "-x param"; repeats replace previous param.
 
 
 Example
 -------
 
 ```
-main(Args) ->
-	{ok, Olist, ArgsN} = getopt:parse(Args, [
-		{$f, true, foo},
-		{$b, false, bar} 
-	]),
-	do_something(Olist),
-	io:format("arguments ~p~n", [ArgsN]).
-	
-do_something([]) ->	
-	ok;
-do_something([Option | Tail]) ->
-	show(Option),
-	do_something(Tail).
+-module(example).
+-export([main/1]).
 
-show({foo, _}) ->
-	io:format("-f~n");
-show({bar, Value}) ->
-	io:format("-b \"~p\"~n", [Value]).	
+main(Args) ->
+	case egetopt:parse(Args, [
+		{ $a, flag, opt_a },
+		{ $b, count, opt_b },
+		{ $c, param, opt_c },
+		{ $d, list, opt_d }
+	]) of
+	{ok, Options, ArgsN} ->
+		io:format("parsed ~p, remaining ~p~n", [Options, ArgsN]);
+	{error, Reason, Opt} ->
+		io:format("~s -~c~n", [Reason, Opt])
+	end.
 ```
+
+```
+$ example -aa -b -bb -cfoo -done -c replace -d two hey you
+parsed [{opt_d,["two","one"]},{opt_c,"replace"},{opt_b,3},{opt_a,true}], remaining ["hey","you"]
+
+$ example -aa -b -bb -cfoo -done -- -c replace -d two hey you
+parsed [{opt_d,["one"]},{opt_c,"foo"},{opt_b,3},{opt_a,true}], remaining ["-c","replace","-d",
+"two","hey","you"]
+
+$ example -ab -b - boo boo
+parsed [{opt_b,2},{opt_a,true}], remaining ["-","boo","boo"]
+
+$ example -a -b -x -y
+unknown option -x
+
+$ example -a -c
+missing argument -c
+```
+
 
 Copyright
 ---------

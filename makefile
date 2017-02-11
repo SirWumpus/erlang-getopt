@@ -27,7 +27,8 @@ distclean: clean
 tar:
 	git archive --format tar.gz --prefix ${PROJ}/ -o ${PROJ}.tar.gz HEAD
 
-
 example:
 	rebar3 as example escriptize
 
+testall:
+	rebar3 eunit

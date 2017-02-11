@@ -1,5 +1,5 @@
 %%#!/usr/bin/env escript
--module(getopt).
+-module(egetopt).
 %-compile(export_all).
 -export([parse/2]).
 
@@ -9,7 +9,7 @@
 %%	line option and argument rules.
 %%
 %% @param Opts
-%%	List of option tuples, [ { Glyph, IsFlag, Name } ].
+%%	List of option tuples, [ { Glyph, OptType, Name } ].
 %%
 %%	An argument that starts with a leading hyphen (-) followed by
 %%	a single character, "-f".  An option is either an option-flag,
@@ -52,18 +52,61 @@ parse_opt([], _Opts, Args, Acc) ->
 parse_opt([Ch | Chs], Opts, Args, Acc) ->
 	case proplists:lookup(Ch, Opts) of
 	%% -fgh
-	{_, true, Name} ->
-		parse_opt(Chs, Opts, Args, [ {Name, true} | Acc ]);
+	{Ch, flag, Name} ->
+		%% Stop duplicates being added.
+		case proplists:get_value(Name, Acc) of
+		undefined ->
+			parse_opt(Chs, Opts, Args, [ {Name, true} | Acc ]);
+		_ ->
+			parse_opt(Chs, Opts, Args, Acc)
+		end;
+
+	%% -fff or -f -f -f
+	{Ch, count, Name} ->
+		%% Count duplicates.
+		case proplists:get_value(Name, Acc) of
+		undefined ->
+			parse_opt(Chs, Opts, Args, [ {Name, 1} | Acc ]);
+		Value ->
+			parse_opt(Chs, Opts, Args,
+				lists:keyreplace(Name, 1, Acc, {Name, Value+1}))
+		end;
+
 	%% -f{arg}
-	{_, false, Name} when Chs /= [] ->
-		{ok, [ {Name, Chs} | Acc ], Args};
+	{Ch, param, Name} when Chs /= [] ->
+		option_arg(Name, Chs, Args, Acc);
+
 	%% -f {arg}
-	{_, false, Name} when Args /= [] ->
-		{ok, [ {Name, hd(Args)} | Acc ], tl(Args)};
+	{Ch, param, Name} when Args /= [] ->
+		option_arg(Name, hd(Args), tl(Args), Acc);
+
+	%% -f{arg} -f{arg2}
+	{Ch, list, Name} when Chs /= [] ->
+		option_list(Name, Chs, Args, Acc);
+
+	%% -f {arg} -f {arg2}
+	{Ch, list, Name} when Args /= [] ->
+		option_list(Name, hd(Args), tl(Args), Acc);
+
 	%% -f
-	{_, false, _} ->
+	{Ch, _, _} ->
 		{error, "missing argument", Ch};
 	none ->
 		{error, "unknown option", Ch}
 	end.
 
+option_arg(Name, Value, Args, Acc) ->
+	case proplists:get_value(Name, Acc) of
+	undefined ->
+		{ok, [ {Name, Value} | Acc ], Args};
+	_ ->
+		{ok, lists:keyreplace(Name, 1, Acc, {Name, Value}), Args}
+	end.
+
+option_list(Name, Item, Args, Acc) ->
+	case proplists:get_value(Name, Acc) of
+	undefined ->
+		{ok, [ {Name, [ Item ]} | Acc ], Args};
+	Value ->
+		{ok, lists:keyreplace(Name, 1, Acc, {Name, [ Item | Value ]}), Args}
+	end.

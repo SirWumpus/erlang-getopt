@@ -1,14 +1,14 @@
-{application, getopt, [
+{application, egetopt, [
+	{pkg_name, "egetopt"},
 	{vsn, "1.0.0"},
 	{description, "POSIX style command-line option parsing."},
+	{links, [{"Github", "https://github.com/sirwumpus/erlang-getopt"}]},
 	{applications, [
 		kernel,
 		stdlib
 	]},
 	{licenses, ["MIT"]},
-	{registered, []},
-	{modules, [example, getopt]},
-	{env, []},
+	{modules, [example, egetopt]},
 	{files, [
 		"README.md",
 		"makefile",
