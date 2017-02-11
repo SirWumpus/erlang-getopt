@@ -2,7 +2,7 @@
 	{pkg_name, "egetopt"},
 	{vsn, "1.0.0"},
 	{description, "POSIX style command-line option parsing."},
-	{links, [{"Github", "https://github.com/sirwumpus/erlang-getopt"}]},
+	{links, [{"Github", "https://github.com/SirWumpus/erlang-getopt"}]},
 	{applications, [
 		kernel,
 		stdlib
@@ -13,6 +13,7 @@
 		"README.md",
 		"makefile",
 		"rebar.config",
-		"src"
+		"src",
+		"test"
 	]}
 ]}.
