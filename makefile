@@ -4,7 +4,7 @@ B = .beam
 E =
 .SUFFIXES : .h .c .i $O $E .hrl .erl .beam .sh
 
-PROJ		:= ehello
+PROJ		:= egetopt
 
 BIN		:= _build/default/bin
 ELIB		:= _build/default/lib
