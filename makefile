@@ -1,34 +1,23 @@
-A = .a
-O = .o
-B = .beam
-E =
-.SUFFIXES : .h .c .i $O $E .hrl .erl .beam .sh
+PROJECT = egetopt
+PROJECT_DESCRIPTION = POSIX style command-line option parsing.
+PROJECT_VERSION = 1.1.0
 
-PROJ		:= egetopt
+include erlang.mk
 
-BIN		:= _build/default/bin
-ELIB		:= _build/default/lib
-EBIN		:= ${ELIB}/${PROJ}/ebin
-ERLC_FLAGS	:= -o${EBIN}
+nuke: distclean
+	rm -rf _build *.beam example example2 example3
 
-$E$B:
-	erlc ${ERLC_FLAGS} $@
+examples: example example2 example3
 
-all:
-#	erl -make
-	rebar3 compile
+example: src/example.erl src/egetopt.erl
+	${MAKE} ESCRIPT_NAME=example escript
 
-clean:
-	-rm -rf src/*$B ./*$B *dump
+example2: src/example2.erl src/egetopt.erl
+	${MAKE} ESCRIPT_NAME=example2 escript
 
-distclean: clean
-	-rm -rf _build ebin
+example3: src/example3.erl src/egetopt.erl
+	${MAKE} ESCRIPT_NAME=example3 escript
 
 tar:
-	git archive --format tar.gz --prefix ${PROJ}/ -o ${PROJ}.tar.gz HEAD
+	git archive --format tar.gz --prefix ${PROJECT}/ -o ${PROJECT}-${PROJECT_VERSION}.tar.gz HEAD
 
-example:
-	rebar3 as example escriptize
-
-testall:
-	rebar3 eunit

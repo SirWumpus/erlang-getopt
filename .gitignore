@@ -22,6 +22,7 @@
 .eunit
 .gdbinit
 .idea
+.erlang.mk
 .rebar
 .rebar3
 _*
@@ -33,4 +34,4 @@ log
 logs
 priv
 ref
-
+egetopt.d
