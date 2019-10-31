@@ -11,29 +11,25 @@ Data Types
 * Glyph = alpha() | digit()
 * MapSpec = #{ Glyph => { OptName, OptType } }
 * OptName = atom()
-* OptSpec = TupleSpec | MapSpec | StringSpec
+* OptSpec = MapSpec | StringSpec
 * OptType = count | flag | list | param
 * Map = #{FlagName => true, CountName => integer() ParamName => string(), ListName => [ stringN(), ..., string1() ] }
-* Plist = [ {OptName1, Value1}, ..., {OptNameN, ValueN} ]
 * StringSpec = string()
-* TupleSpec = [ { Glyph, OptType, OptName } ]
 
 Exports
 -------
 
-### parse(Args, OptSpec) -> {ok, Map_or_Plist, ArgsRemaining} | {error, Reason, Glyph}
+### parse(Args, OptSpec) -> {ok, Map, ArgsRemaining} | {error, Reason, Glyph}
 
 Parse list of strings according to POSIX command-line option and argument rules.  An argument that starts with a leading hyphen (-) followed by a single character, "-f".  An option is either an option-flag, "-f", or option-parameter, "-x param".  Option-flags can appear together in any order as a list, "-hfg"; an option-parameter can appear at the end of list of option-flags, "-hfgx param" or "-hfgxparam".  Options can appear in any order and be repeated until a "--" argument is seen, which indicates the remainder are only arguments.
 
-The `OptSpec` can be one of three formats:
+The `OptSpec` can be one of two formats:
 
 * The `StringSpec`, similar to `getopt(3)`, is a string consisting of individual characters for option-flags and characters followed by a colon `:` to indicate an option-parameter is to follow.  As an extension, characters followed by a hash `#` for option-count and characters followed by semi-colon `;` for option-list.  The `OptName` used in the returned map is the option glyph prefixed by `opt_`.
 
 * The `MapSpec` is a map keyed by option glyph, whos value is a tuple with `{OptName, OptType}`.
 
-* The `TupleSpec` is a tuple list of `{Glyph, OptType, OptName}`.
-
-The returned result is a map keyed by `OptName`.  Each option's value varies according to the `OptType` given: `flag` simple sets the option to `true`; `count` for the number of times an option flag is repeated; `param` sets an option to the last seen parameter string; and `list` set an option to a list of parameter strings in collected in reverse order.
+The map returned as part of the result tuple is keyed by `OptName`.  Each option's value varies according to the `OptType` given by `OptSpec`: `flag` simple sets the option to `true`; `count` for the number of times an option flag is repeated; `param` sets an option to the last seen parameter string; and `list` set an option to a list of parameter strings in collected in reverse order.
 
 
 Example
@@ -54,15 +50,12 @@ main(Args) ->
 
 ```
 $ example -aa -b -bb -cfoo -done -c replace -d two hey you
-parsed #{option_a => true,option_b => 3,option_c => "replace",
-option_d => ["two","one"]}, remaining ["hey","you"]
+parsed #{opt_a => true,opt_b => 3,opt_c => "replace",
+opt_d => ["two","one"]}, remaining ["hey","you"]
 
 $ example2 -aa -b -bb -cfoo -done -- -c replace -d two hey you
 parsed #{some_a => true,some_b => 3,some_c => "foo",some_d => ["one"]},
 remaining ["-c", "replace", "-d", "two", "hey", "you"]
-
-$ ./example3 -ab -b - boo boo
-parsed #{opt_a => true,opt_b => 2}, remaining ["-","boo","boo"]
 
 $ example -a -b -x -y
 unknown option -x
@@ -81,7 +74,8 @@ usage: example [-a][-b...][-c param][-d item] ...
 -d item         add item to list
 ```
 
-`example` uses the older tuple list specification; `example2` uses the map specification, and `example3` uses a `getopt(3)` style option string specification with the extensions for count and list types.
+`example` uses a `getopt(3)` style option string specification with the extensions for count and list types, and
+`example2` uses the map specification with different option names.
 
 
 Copyright

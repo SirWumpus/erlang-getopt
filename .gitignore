@@ -28,6 +28,7 @@
 _*
 core
 core.*
+cover
 data
 ebin
 log

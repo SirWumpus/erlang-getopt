@@ -23,22 +23,12 @@
 %%	tuple; or a tuple list of {glyph, type, name}.
 %%
 %% @return
-%%	On succes {ok, Map_or_Plist, ArgsRemaining}; otherwise {error, Reason, Glyph}.
+%%	On success {ok, Map, ArgsRemaining}; otherwise {error, Reason, Glyph}.
 %%
-%%
-%%
-parse(Args, Opts) when is_tuple(hd(Opts)) ->
-	% 1.0.0 behaviour.
-	case parse_opts(Args, map_opts_tuple(Opts), #{}) of
-	{ok, Map, ArgsN} ->
-		{ok, maps:to_list(Map), ArgsN};
-	Other ->
-		Other
-	end;
 parse(Args, Opts) when is_map(Opts) ->
-	parse_opts(Args, Opts, #{});
+	parse_opts(Args, Opts, map_opts_defaults(Opts));
 parse(Args, Opts) ->
-	parse_opts(Args, map_opts_string(Opts), #{}).
+	parse(Args, map_opts_string(Opts)).
 
 % End of arguments?
 parse_opts([], _Opts, Acc) ->
@@ -105,7 +95,7 @@ parse_opt([Ch | Chs], Opts, Args, Acc) ->
 		{error, "unknown option", Ch}
 	end.
 
-%% Convert getopt(3) optstring into map of #{Glyph := {Type, Name}}.
+%% Convert getopt(3) optstring into map of #{Glyph := {Name, Type}}.
 map_opts_string(Opts) ->
 	map_opts_string(Opts, #{}).
 map_opts_string([], Acc) ->
@@ -123,10 +113,18 @@ map_opts_string([Opt | Opts], Acc) ->
 	Name = binary_to_atom(<<"opt_", Opt>>, latin1),
 	map_opts_string(Opts, Acc#{Opt => {Name, flag}}).
 
-%% Convert original 1.0.0 option specification tuple into map.
-map_opts_tuple(Opts) ->
-	map_opts_tuple(Opts, #{}).
-map_opts_tuple([], Acc) ->
+%% Initialise option defaults.
+map_opts_defaults(Opts) ->
+	map_opts_default(maps:values(Opts), #{}).
+map_opts_default([], Acc) ->
 	Acc;
-map_opts_tuple([{Glyph, Type, Name} | Opts], Acc) ->
-	map_opts_tuple(Opts, Acc#{Glyph => {Name, Type}}).
+map_opts_default([{Name, flag} | Opts], Acc) ->
+	map_opts_default(Opts, Acc#{Name => false});
+map_opts_default([{Name, count} | Opts], Acc) ->
+	map_opts_default(Opts, Acc#{Name => 0});
+map_opts_default([{Name, param} | Opts], Acc) ->
+	map_opts_default(Opts, Acc#{Name => nil});
+map_opts_default([{Name, list} | Opts], Acc) ->
+	map_opts_default(Opts, Acc#{Name => []});
+map_opts_default([_Other | Opts], Acc) ->
+	map_opts_default(Opts, Acc).

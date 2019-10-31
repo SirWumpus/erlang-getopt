@@ -10,12 +10,8 @@ usage() ->
 	io:format("-d item\t\tadd item to list~n"),
 	halt(2).
 
-options() -> [
-	{ $a, flag,  option_a },
-	{ $b, count, option_b },
-	{ $c, param, option_c },
-	{ $d, list,  option_d }
-].
+options() ->
+	"ab#c:d;".
 
 main(Args) ->
 	case egetopt:parse(Args, options()) of
