@@ -11,25 +11,44 @@ Data Types
 * Glyph = alpha() | digit()
 * MapSpec = #{ Glyph => { OptName, OptType } }
 * OptName = atom()
-* OptSpec = MapSpec | StringSpec
+* OptSpec = MapSpec | StringSpec | TupleSpec
 * OptType = count | flag | list | param
 * Map = #{FlagName => true, CountName => integer() ParamName => string(), ListName => [ stringN(), ..., string1() ] }
+* TupleSpec = [ { Glyph, OptType, OptName } ]
 * StringSpec = string()
 
 Exports
 -------
 
-### parse(Args, OptSpec) -> {ok, Map, ArgsRemaining} | {error, Reason, Glyph}
+### egetopt:parse(Args, OptSpec) -> {ok, Plist, ArgsRemaining} | {error, Reason, Glyph}
 
 Parse list of strings according to POSIX command-line option and argument rules.  An argument that starts with a leading hyphen (-) followed by a single character, "-f".  An option is either an option-flag, "-f", or option-parameter, "-x param".  Option-flags can appear together in any order as a list, "-hfg"; an option-parameter can appear at the end of list of option-flags, "-hfgx param" or "-hfgxparam".  Options can appear in any order and be repeated until a "--" argument is seen, which indicates the remainder are only arguments.
 
-The `OptSpec` can be one of two formats:
+The `OptSpec` can be one of three formats:
 
 * The `StringSpec`, similar to `getopt(3)`, is a string consisting of individual characters for option-flags and characters followed by a colon `:` to indicate an option-parameter is to follow.  As an extension, characters followed by a hash `#` for option-count and characters followed by semi-colon `;` for option-list.  The `OptName` used in the returned map is the option glyph prefixed by `opt_`.
 
 * The `MapSpec` is a map keyed by option glyph, whos value is a tuple with `{OptName, OptType}`.
 
-The map returned as part of the result tuple is keyed by `OptName`.  Each option's value varies according to the `OptType` given by `OptSpec`: `flag` simple sets the option to `true`; `count` for the number of times an option flag is repeated; `param` sets an option to the last seen parameter string; and `list` set an option to a list of parameter strings in collected in reverse order.
+* The `TupleSpec` is a tuple list of `{Glyph, OptType, OptName}`.
+
+The `Plist` returned is keyed by `OptName`.  Each option's value varies according to the `OptType` given by `OptSpec`: `flag` simple sets the option to `true`; `count` for the number of times an option flag is repeated; `param` sets an option to the last seen parameter string; and `list` set an option to a list of parameter strings collected in reverse order.
+
+### egetopt:to_map(Args, OptSpec) -> {ok, Map, ArgsRemaining} | {error, Reason, Glyph}
+
+Same as `egetopt:parse/2`, returning a `Map` in place of `Plist` for an `ok` result.
+
+### opts:to_map(Args, OptSpec) -> {ok, Map, ArgsRemaining} | {error, Reason, Glyph}
+
+Similar to `egetopt:to_map/2`, with the side-effect of saving the parsed options as an `ets` table.
+
+### opts:get(OptName) -> Value | undefined
+
+Get the `OptName` from the `ets` table returning a value.
+
+### opts:get(OptName, Default) -> Value | Default
+
+Get the `OptName` from the `ets` table returning a value; otherwise `Default` .
 
 
 Example
@@ -76,12 +95,13 @@ usage: example [-a][-b...][-c param][-d item] ...
 
 `example` uses a `getopt(3)` style option string specification with the extensions for count and list types, and
 `example2` uses the map specification with different option names.
+`example3` uses the tuple-list specification with different option names.
 
 
 Copyright
 ---------
 
-Copyright 2017, 2019 by Anthony Howe.  All rights reserved.
+Copyright 2017, 2021 by Anthony Howe.  All rights reserved.
 
 
 MIT License

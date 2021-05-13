@@ -1,6 +1,35 @@
 -module(egetopt).
 %-compile(export_all).
--export([parse/2]).
+-export([parse/2, to_map/2]).
+
+-type args()		:: [string()].
+-type glyph()		:: 16#21..16#7E.
+-type optname()		:: atom().
+-type opttype()		:: count | flag | list | param.
+-type optarg()		:: undefined | boolean() | non_neg_integer() | string() | [string()].
+-type optlist()		:: [{glyph(), opttype(), optname()}].
+-type optmap()		:: #{glyph() => {optname(), opttype()}}.
+-type opts()		:: string() | optmap() | optlist().
+
+-type ret_plist()	:: [{optname(), optarg()}].
+-type ret_map()		:: #{optname() => optarg()}.
+-type ret_err()		:: {error, string(), glyph()}.
+-type ret_ok(Ret)	:: {ok, Ret, args()}.
+
+-export_type([
+	args/0,
+	glyph/0,
+	optname/0,
+	opttype/0,
+	optarg/0,
+	optlist/0,
+	optmap/0,
+	opts/0,
+	ret_plist/0,
+	ret_map/0,
+	ret_err/0,
+	ret_ok/1
+]).
 
 %%
 %% @param Args
@@ -23,13 +52,27 @@
 %%	tuple; or a tuple list of {glyph, type, name}.
 %%
 %% @return
-%%	On success {ok, Map, ArgsRemaining}; otherwise {error, Reason, Glyph}.
+%%	On success {ok, Plist, ArgsRemaining}; otherwise {error, Reason, Glyph}.
 %%
-parse(Args, Opts) when is_map(Opts) ->
-	parse_opts(Args, Opts, map_opts_defaults(Opts));
+-spec parse(args(), opts()) -> ret_ok(ret_plist()) | ret_err().
 parse(Args, Opts) ->
-	parse(Args, map_opts_string(Opts)).
+	case to_map(Args, Opts) of
+	{ok, Options, ArgsN} ->
+		{ok, maps:to_list(Options), ArgsN};
+	Other ->
+		Other
+	end.
 
+-spec to_map(args(), opts()) -> ret_ok(ret_map()) | ret_err().
+to_map(Args, Opts) when is_map(Opts) ->
+	parse_opts(Args, Opts, map_opts_defaults(Opts));
+to_map(Args, [Opt | Opts]) when is_tuple(Opt) ->
+	% 1.0.0 behaviour.
+	to_map(Args, map_opts_tuple([Opt | Opts]));
+to_map(Args, Opts) ->
+	to_map(Args, map_opts_string(Opts)).
+
+-spec parse_opts(args(), optmap(), ret_map()) -> ret_ok(ret_map()) | ret_err().
 % End of arguments?
 parse_opts([], _Opts, Acc) ->
 	{ok, Acc, []};
@@ -51,6 +94,7 @@ parse_opts([ [$- | Arg] | Args], Opts, Acc) ->
 parse_opts(Args, _Opts, Acc) ->
 	{ok, Acc, Args}.
 
+-spec parse_opt(args(), optmap(), args(), ret_map()) -> ret_ok(ret_map()) | ret_err().
 parse_opt([], _Opts, Args, Acc) ->
 	{ok, Acc, Args};
 parse_opt([Ch | Chs], Opts, Args, Acc) ->
@@ -96,8 +140,11 @@ parse_opt([Ch | Chs], Opts, Args, Acc) ->
 	end.
 
 %% Convert getopt(3) optstring into map of #{Glyph := {Name, Type}}.
+-spec map_opts_string(opts()) -> ret_map().
 map_opts_string(Opts) ->
 	map_opts_string(Opts, #{}).
+
+-spec map_opts_string(opts(), optmap()) -> optmap().
 map_opts_string([], Acc) ->
 	Acc;
 map_opts_string([Opt, $: | Opts], Acc) ->
@@ -114,8 +161,11 @@ map_opts_string([Opt | Opts], Acc) ->
 	map_opts_string(Opts, Acc#{Opt => {Name, flag}}).
 
 %% Initialise option defaults.
+-spec map_opts_defaults(optmap()) -> optmap().
 map_opts_defaults(Opts) ->
 	map_opts_default(maps:values(Opts), #{}).
+
+-spec map_opts_default(optmap(), ret_map()) -> ret_map().
 map_opts_default([], Acc) ->
 	Acc;
 map_opts_default([{Name, flag} | Opts], Acc) ->
@@ -123,8 +173,17 @@ map_opts_default([{Name, flag} | Opts], Acc) ->
 map_opts_default([{Name, count} | Opts], Acc) ->
 	map_opts_default(Opts, Acc#{Name => 0});
 map_opts_default([{Name, param} | Opts], Acc) ->
-	map_opts_default(Opts, Acc#{Name => nil});
+	map_opts_default(Opts, Acc#{Name => undefined});
 map_opts_default([{Name, list} | Opts], Acc) ->
-	map_opts_default(Opts, Acc#{Name => []});
-map_opts_default([_Other | Opts], Acc) ->
-	map_opts_default(Opts, Acc).
+	map_opts_default(Opts, Acc#{Name => []}).
+
+%% Convert original 1.0.0 option specification tuple into map.
+-spec map_opts_tuple(optlist()) -> optmap().
+map_opts_tuple(Opts) ->
+	map_opts_tuple(Opts, #{}).
+
+-spec map_opts_tuple(optlist(), optmap()) -> optmap().
+map_opts_tuple([], Acc) ->
+	Acc;
+map_opts_tuple([{Glyph, Type, Name} | Opts], Acc) ->
+	map_opts_tuple(Opts, Acc#{Glyph => {Name, Type}}).
