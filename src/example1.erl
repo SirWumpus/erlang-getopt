@@ -1,9 +1,9 @@
 %%#!/usr/bin/env escript
--module(example).
+-module(example1).
 -export([main/1]).
 
 usage() ->
-	io:format("usage: example [-a][-b...][-c param][-d item] ...~n"),
+	io:format("usage: example1 [-a][-b...][-c param][-d item] ...~n"),
 	io:format("-a\t\tset flag true~n"),
 	io:format("-b\t\tcount repeated occurences~n"),
 	io:format("-c param\tset parameter~n"),
