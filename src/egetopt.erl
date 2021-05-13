@@ -180,10 +180,4 @@ map_opts_default([{Name, list} | Opts], Acc) ->
 %% Convert original 1.0.0 option specification tuple into map.
 -spec map_opts_tuple(optlist()) -> optmap().
 map_opts_tuple(Opts) ->
-	map_opts_tuple(Opts, #{}).
-
--spec map_opts_tuple(optlist(), optmap()) -> optmap().
-map_opts_tuple([], Acc) ->
-	Acc;
-map_opts_tuple([{Glyph, Type, Name} | Opts], Acc) ->
-	map_opts_tuple(Opts, Acc#{Glyph => {Name, Type}}).
+	maps:from_list([{Glyph, {Name, Type}} || {Glyph, Type, Name} <- Opts]).
