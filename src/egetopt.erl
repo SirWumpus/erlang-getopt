@@ -65,7 +65,7 @@ parse(Args, Opts) ->
 
 -spec to_map(args(), opts()) -> ret_ok(ret_map()) | ret_err().
 to_map(Args, Opts) when is_map(Opts) ->
-	parse_opts(Args, Opts, map_opts_defaults(Opts));
+	parse_opts(Args, Opts, #{});
 to_map(Args, [Opt | Opts]) when is_tuple(Opt) ->
 	% 1.0.0 behaviour.
 	to_map(Args, map_opts_tuple([Opt | Opts]));
@@ -160,24 +160,7 @@ map_opts_string([Opt | Opts], Acc) ->
 	Name = binary_to_atom(<<"opt_", Opt>>, latin1),
 	map_opts_string(Opts, Acc#{Opt => {Name, flag}}).
 
-%% Initialise option defaults.
--spec map_opts_defaults(optmap()) -> optmap().
-map_opts_defaults(Opts) ->
-	map_opts_default(maps:values(Opts), #{}).
-
--spec map_opts_default(optmap(), ret_map()) -> ret_map().
-map_opts_default([], Acc) ->
-	Acc;
-map_opts_default([{Name, flag} | Opts], Acc) ->
-	map_opts_default(Opts, Acc#{Name => false});
-map_opts_default([{Name, count} | Opts], Acc) ->
-	map_opts_default(Opts, Acc#{Name => 0});
-map_opts_default([{Name, param} | Opts], Acc) ->
-	map_opts_default(Opts, Acc#{Name => undefined});
-map_opts_default([{Name, list} | Opts], Acc) ->
-	map_opts_default(Opts, Acc#{Name => []}).
-
-%% Convert original 1.0.0 option specification tuple into map.
+% Convert original 1.0.0 option tuple specification into map.
 -spec map_opts_tuple(optlist()) -> optmap().
 map_opts_tuple(Opts) ->
 	maps:from_list([{Glyph, {Name, Type}} || {Glyph, Type, Name} <- Opts]).

@@ -28,9 +28,9 @@ to_map_test_() -> [
 	?_assertMatch({error, "missing parameter", $c}, egetopt:to_map(["-a","-c"], ?OPTSTRING)),
 
 	% Defaults
-	?_assertMatch({ok,#{opt_a:=false, opt_b:=0, opt_c:=undefined, opt_d:=[]},["foo","bar"]}, egetopt:to_map(["foo","bar"], ?OPTSTRING)),
-	?_assertMatch({ok,#{opt_a:=false, opt_b:=0, opt_c:=undefined, opt_d:=[]},["foo","bar"]}, egetopt:to_map(["--","foo","bar"], ?OPTSTRING)),
-	?_assertMatch({ok,#{opt_a:=false, opt_b:=0, opt_c:=undefined, opt_d:=[]},["-", "foo","bar"]}, egetopt:to_map(["-","foo","bar"], ?OPTSTRING)),
+	?_assertMatch({ok,#{},["foo","bar"]}, egetopt:to_map(["foo","bar"], ?OPTSTRING)),
+	?_assertMatch({ok,#{},["foo","bar"]}, egetopt:to_map(["--","foo","bar"], ?OPTSTRING)),
+	?_assertMatch({ok,#{},["-", "foo","bar"]}, egetopt:to_map(["-","foo","bar"], ?OPTSTRING)),
 
 	% Flag
 	?_assertMatch({ok,#{opt_a:=true},[]}, egetopt:to_map(["-a"], ?OPTSTRING)),
@@ -57,7 +57,7 @@ to_map_test_() -> [
 	?_assertMatch({ok,#{opt_a:=true},["-b"]}, egetopt:to_map(["-a","--","-b"], ?OPTSTRING)),
 	?_assertMatch({ok,#{opt_a:=true},["-", "-b"]}, egetopt:to_map(["-a","-","-b"], ?OPTSTRING)),
 
-	?_assertMatch({ok,#{opt_b:=0, opt_c:="foo"},["bar"]}, egetopt:to_map(["-c","foo","bar"], ?OPTSTRING)),
+	?_assertMatch({ok,#{opt_c:="foo"},["bar"]}, egetopt:to_map(["-c","foo","bar"], ?OPTSTRING)),
 	?_assertMatch({ok,#{opt_b:=1, opt_c:="--"},["baka"]}, egetopt:to_map(["-c","--","-b","baka"], ?OPTSTRING)),
 	?_assertMatch({ok,#{opt_b:=1, opt_c:="-"},["baka"]}, egetopt:to_map(["-c","-","-b","baka"], ?OPTSTRING)),
 
@@ -79,11 +79,11 @@ parse_test_() -> [
 		egetopt:parse(["-x"], ?OPTSTRING)
 	),
 	?_assertMatch(
-		{ok,[{opt_a,false},{opt_b,0},{opt_c,"world"},{opt_d,[]}],[]},
+		{ok,[{opt_c,"world"}],[]},
 		egetopt:parse(["-chello","-c","world"], ?OPTSTRING)
 	),
 	?_assertMatch(
-		{ok,[{opt_a,false},{opt_b,0},{opt_c,undefined},{opt_d,["world","hello"]}],[]},
+		{ok,[{opt_d,["world","hello"]}],[]},
 		egetopt:parse(["-dhello","-d","world"], ?OPTSTRING)
 	),
 	?_assertMatch(
