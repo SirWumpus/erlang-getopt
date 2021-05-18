@@ -1,25 +1,41 @@
-PROJECT = egetopt
-PROJECT_DESCRIPTION = POSIX style command-line option parsing.
-PROJECT_VERSION = 1.1.0
-COVER=1
+A = .a
+O = .o
+B = .beam
+E =
+.SUFFIXES : .h .c .i $O $E .hrl .erl .beam .sh
 
-include erlang.mk
+PROJ		:= egetopt
 
-all:: examples
+BIN		:= _build/default/bin
+ELIB		:= _build/default/lib
+EBIN		:= ${ELIB}/${PROJ}/ebin
+ERLC_FLAGS	:= -o${EBIN}
 
-distclean::
-	-rm example[123]
+$E$B:
+	erlc ${ERLC_FLAGS} $@
 
-examples: example1 example2 example3
+all:
+	rebar3 compile
 
-example1: src/example1.erl src/egetopt.erl
-	${MAKE} ESCRIPT_NAME=example1 escript
+clean:
+	-rm -rf src/*$B ./*$B *dump
 
-example2: src/example2.erl src/egetopt.erl
-	${MAKE} ESCRIPT_NAME=example2 escript
-
-example3: src/example3.erl src/egetopt.erl
-	${MAKE} ESCRIPT_NAME=example3 escript
+distclean: clean
+	-rm -rf _build cover ebin
 
 tar:
-	git archive --format tar.gz --prefix ${PROJECT}/ -o ${PROJECT}-${PROJECT_VERSION}.tar.gz HEAD
+	git archive --format tar.gz --prefix ${PROJ}/ -o ${PROJ}.tar.gz HEAD
+
+examples:
+	rebar3 as example1 escriptize
+	rebar3 as example2 escriptize
+	rebar3 as example3 escriptize
+
+test: dialyzer unit
+
+dialyzer:
+	rebar3 dialyzer
+
+unit:
+	rebar3 eunit --cover
+	rebar3 cover
