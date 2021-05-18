@@ -8,7 +8,7 @@
 		stdlib
 	]},
 	{licenses, ["MIT"]},
-	{modules, [example, egetopt]},
+	{modules, [egetopt,opts,example1,example2,example3]},
 	{files, [
 		"README.md",
 		"makefile",
