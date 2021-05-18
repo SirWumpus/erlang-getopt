@@ -14,10 +14,10 @@ options() ->
 	"ab#c:d;".
 
 main(Args) ->
-	case egetopt:parse(Args, options()) of
-	{ok, Options, ArgsN} ->
-		io:format("parsed ~p, remaining ~p~n", [Options, ArgsN]);
+	case opts:to_map(Args, options()) of
 	{error, Reason, Opt} ->
 		io:format("~s -~c~n", [Reason, Opt]),
-		usage()
+		usage();
+	{ok, _Options, ArgsN} ->
+		io:format("parsed ~p, opt_b again is ~p, remaining ~p~n", [opts:dump(), opts:get(opt_b), ArgsN])
 	end.
