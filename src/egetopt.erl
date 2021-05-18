@@ -140,11 +140,11 @@ parse_opt([Ch | Chs], Opts, Args, Acc) ->
 	end.
 
 %% Convert getopt(3) optstring into map of #{Glyph := {Name, Type}}.
--spec map_opts_string(opts()) -> ret_map().
+-spec map_opts_string(string()) -> optmap().
 map_opts_string(Opts) ->
 	map_opts_string(Opts, #{}).
 
--spec map_opts_string(opts(), optmap()) -> optmap().
+-spec map_opts_string(string(), optmap()) -> optmap().
 map_opts_string([], Acc) ->
 	Acc;
 map_opts_string([Opt, $: | Opts], Acc) ->
