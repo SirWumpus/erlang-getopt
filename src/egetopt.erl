@@ -3,7 +3,7 @@
 -export([parse/2, to_map/2]).
 
 -type args()		:: [string()].
--type glyph()		:: 16#21..16#7E.
+-type glyph()		:: 16#21..16#7E.  % ASCII printable character, except hyphen.
 -type optname()		:: atom().
 -type opttype()		:: count | flag | list | param.
 -type optarg()		:: undefined | boolean() | non_neg_integer() | string() | [string()].
@@ -32,27 +32,26 @@
 ]).
 
 %%
-%% @param Args
-%%	List of argument strings to parse according to POSIX command-
-%%	line option and argument rules.
+%% Parse a list of strings according to POSIX command-line option and
+%% argument rules.
 %%
-%%	An argument that starts with a leading hyphen (-) followed by
-%%	a single character, "-f".  An option is either an option-flag,
-%%	"-f", or option-argument, "-x arg".  Option-flags can appear
-%%	together in any order as a list, "-hfg"; an option-argument can
-%%	appear at the end of list of option-flags, "-hfgx arg" or
-%%	"-hfgxarg".  Options can appear in any order until a "--"
+%% @param Args
+%%	An argument that starts with a leading hyphen (`-') followed by
+%%	a single character, `-f'.  An option is either an option-flag,
+%%	`-f', or option-argument, `-x arg'.  Option-flags can appear
+%%	together in any order as a list, `-hfg'; an option-argument can
+%%	appear at the end of list of option-flags, `-hfgx arg' or
+%%	`-hfgxarg'.  Options can appear in any order until a `--'
 %%	argument is seen, which indicates the remainder are only
 %%	arguments.
 %%
 %% @param Opts
-%%
 %%	An option specification can be one of three formats: a getopt(3)
 %%	style string; a mapping of option glyph to option name and type
-%%	tuple; or a tuple list of {glyph, type, name}.
+%%	tuple; or a tuple list of `{glyph, type, name}'.
 %%
 %% @return
-%%	On success {ok, Plist, ArgsRemaining}; otherwise {error, Reason, Glyph}.
+%%	On success `{ok, Plist, ArgsRemaining}'; otherwise `{error, Reason, Glyph}'.
 %%
 -spec parse(args(), opts()) -> ret_ok(ret_plist()) | ret_err().
 parse(Args, Opts) ->

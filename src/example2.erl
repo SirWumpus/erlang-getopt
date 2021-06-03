@@ -1,7 +1,11 @@
 %%#!/usr/bin/env escript
+%%
+%% @private Example using an option map.
+%%
 -module(example2).
 -export([main/1]).
 
+-spec usage() -> none().
 usage() ->
 	io:format("usage: example2 [-a][-b...][-c param][-d item] ...~n"),
 	io:format("-a\t\tset flag true~n"),
@@ -10,6 +14,7 @@ usage() ->
 	io:format("-d item\t\tadd item to list~n"),
 	halt(2).
 
+-spec options() -> egetopt:optmap().
 options() -> #{
 	$a => {some_a, flag},
 	$b => {some_b, count},
@@ -17,6 +22,7 @@ options() -> #{
 	$d => {some_d, list}
 }.
 
+-spec main([string()]) -> ok.
 main(Args) ->
 	case egetopt:parse(Args, options()) of
 	{ok, Options, ArgsN} ->

@@ -1,7 +1,7 @@
 egetopt
 =======
 
-Parse list of strings according to POSIX command-line option and argument rules.  There is no support for GNU long option names, see [jcomellas/getopt](https://github.com/jcomellas/getopt) instead.
+Parse a list of strings according to POSIX command-line option and argument rules.  There is no support for GNU long option names, see [jcomellas/getopt](https://github.com/jcomellas/getopt) instead.
 
 Data Types
 ----------
@@ -48,7 +48,7 @@ Get the `OptName` from the `ets` table returning a value.
 
 ### opts:get(OptName, Default) -> Value | Default
 
-Get the `OptName` from the `ets` table returning a value; otherwise `Default` .
+Get the `OptName` from the `ets` table returning a value; otherwise `Default`.
 
 
 Example

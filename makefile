@@ -18,10 +18,10 @@ all:
 	rebar3 compile
 
 clean:
-	-rm -rf src/*$B ./*$B *dump
+	-rm -rf src/*$B test/*$B ./*$B *dump
 
 distclean: clean
-	-rm -rf _build cover ebin
+	-rm -rf _build cover ebin doc/*.html doc/edoc-info doc/stylesheet.css
 
 tar:
 	git archive --format tar.gz --prefix ${PROJ}/ -o ${PROJ}.tar.gz HEAD

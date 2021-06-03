@@ -1,7 +1,11 @@
 %%#!/usr/bin/env escript
+%%
+%% @private Example using an option tuple list.
+%%
 -module(example3).
 -export([main/1]).
 
+-spec usage() -> none().
 usage() ->
 	io:format("usage: example [-a][-b...][-c param][-d item] ...~n"),
 	io:format("-a\t\tset flag true~n"),
@@ -10,6 +14,7 @@ usage() ->
 	io:format("-d item\t\tadd item to list~n"),
 	halt(2).
 
+-spec options() -> egetopt:optlist().
 options() -> [
 	{ $a, flag,  option_a },
 	{ $b, count, option_b },
@@ -17,6 +22,7 @@ options() -> [
 	{ $d, list,  option_d }
 ].
 
+-spec main([string()]) -> ok.
 main(Args) ->
 	case egetopt:parse(Args, options()) of
 	{ok, Options, ArgsN} ->
