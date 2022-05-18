@@ -3,6 +3,7 @@ egetopt
 
 Parse a list of strings according to POSIX command-line option and argument rules.  There is no support for GNU long option names, see [jcomellas/getopt](https://github.com/jcomellas/getopt) instead.
 
+
 Data Types
 ----------
 
@@ -16,6 +17,7 @@ Data Types
 * Map = #{FlagName => true, CountName => integer() ParamName => string(), ListName => [ stringN(), ..., string1() ] }
 * TupleSpec = [ { Glyph, OptType, OptName } ]
 * StringSpec = string()
+
 
 Exports
 -------
@@ -72,15 +74,15 @@ main(Args) ->
 ```
 
 ```
-$ example -aa -b -bb -cfoo -done -c replace -d two hey you
+$ example1 -aa -b -bb -cfoo -done -c replace -d two hey you
 parsed #{opt_a => true,opt_b => 3,opt_c => "replace",
 opt_d => ["two","one"]}, remaining ["hey","you"]
 
-$ example2 -aa -b -bb -cfoo -done -- -c replace -d two hey you
+$ example1 -aa -b -bb -cfoo -done -- -c replace -d two hey you
 parsed #{some_a => true,some_b => 3,some_c => "foo",some_d => ["one"]},
 remaining ["-c", "replace", "-d", "two", "hey", "you"]
 
-$ example -a -b -x -y
+$ example1 -a -b -x -y
 unknown option -x
 usage: example [-a][-b...][-c param][-d item] ...
 -a              set flag true
@@ -88,7 +90,7 @@ usage: example [-a][-b...][-c param][-d item] ...
 -c param        set parameter
 -d item         add item to list
 
-$ example -a -c
+$ example1 -a -c
 missing parameter -c
 usage: example [-a][-b...][-c param][-d item] ...
 -a              set flag true
@@ -97,7 +99,7 @@ usage: example [-a][-b...][-c param][-d item] ...
 -d item         add item to list
 ```
 
-`example` uses a `getopt(3)` style option string specification with the extensions for count and list types, and
+`example1` uses a `getopt(3)` style option string specification with the extensions for count and list types.
 `example2` uses the map specification with different option names.
 `example3` uses the tuple-list specification with different option names.
 
@@ -105,7 +107,7 @@ usage: example [-a][-b...][-c param][-d item] ...
 Copyright
 ---------
 
-Copyright 2017, 2021 by Anthony Howe.  All rights reserved.
+Copyright 2017, 2022 by Anthony Howe.  All rights reserved.
 
 
 MIT License
