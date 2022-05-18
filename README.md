@@ -50,6 +50,10 @@ Get the `OptName` from the `ets` table returning a value.
 
 Get the `OptName` from the `ets` table returning a value; otherwise `Default`.
 
+### opts:set(OptName, OptArg) -> true
+
+Set the value of an `OptName` in the `ets` table.
+
 
 Example
 -------

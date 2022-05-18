@@ -1,6 +1,6 @@
 -module(opts).
 %-compile(export_all).
--export([to_map/2, get/1, get/2, dump/0]).
+-export([to_map/2, get/1, get/2, set/2, dump/0]).
 
 %%
 %% Similar to `egetopt:parse/2`, with the side-effect of saving the
@@ -35,6 +35,13 @@ get(OptName, Default) ->
 	[{OptName, Value}] -> Value;
 	[] -> Default
 	end.
+
+%%
+%% Set the value of an `OptName` in the `ets` table.
+%%
+-spec set(egetopt:optname(), egetopt:optarg()) -> true.
+set(OptName, OptArg) ->
+	ets:insert(opts_table, {OptName, OptArg}).
 
 %%
 %% Dump the options defined in the `ets` table.
