@@ -1,6 +1,6 @@
 {application, egetopt, [
 	{pkg_name, "egetopt"},
-	{vsn, "1.1.0"},
+	{vsn, "1.2.0"},
 	{description, "POSIX style command-line option parsing."},
 	{links, [{"Github", "https://github.com/SirWumpus/erlang-getopt"}]},
 	{applications, [
